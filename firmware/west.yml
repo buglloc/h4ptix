@@ -1,0 +1,20 @@
+
+# https://docs.zephyrproject.org/4.1.0/develop/west/manifest.html
+
+manifest:
+  #version: 0.1
+  
+  remotes:
+    - name: zephyr
+      url-base: https://github.com/zephyrproject-rtos
+
+  projects:
+    - name: zephyr
+      remote: zephyr
+      repo-path: zephyr
+      revision: v4.1.0
+      clone-depth: 1
+      import:
+        name-allowlist:
+          - cmsis
+          - hal_rpi_pico

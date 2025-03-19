@@ -1,0 +1,7 @@
+board:
+  name: h4ptix
+  full_name: H3ptiX
+  socs:
+  - name: rp2040
+    variants:
+    - name: 'matrix'

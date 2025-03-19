@@ -1,0 +1,6 @@
+{
+  "C_Cpp.default.cppStandard": "c++17",
+  // "C_Cpp.default.intelliSenseMode": "linux-clang-x64",
+  // "C_Cpp.default.compilerPath": "/home/buglloc/zephyr-sdk-0.17.0/riscv64-zephyr-elf/bin/riscv64-zephyr-elf-gcc",
+  "C_Cpp.default.compileCommands": "${workspaceFolder}/firmware/build/compile_commands.json"
+}

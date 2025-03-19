@@ -1,0 +1,2 @@
+config BOARD_H4PTIX
+  select SOC_RP2040

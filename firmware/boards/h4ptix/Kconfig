@@ -1,0 +1,2 @@
+config BOARD_H4PTIX
+  select RP2_FLASH_W25Q080

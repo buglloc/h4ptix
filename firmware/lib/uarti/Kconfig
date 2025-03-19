@@ -1,0 +1,36 @@
+menuconfig UARTI
+  bool "UARTI config"
+  default y
+
+if UARTI
+
+module = UARTI
+module-str = uarti
+source "subsys/logging/Kconfig.template.log_config"
+
+config UARTI_TIMEOUT
+  int "Timeout waiting for a rest of a message in ms"
+  default 150
+
+config UARTI_RX_QUEUE_SIZE
+  int "RX message queue size"
+  default 8
+
+config UARTI_RX_BUFFER_SIZE
+  int "Buffer size in bytes for RX buffer"
+  default 512
+
+config UARTI_TX_BUFFER_SIZE
+  int "Buffer size in bytes for TX buffer"
+  default 1024
+
+config UARTI_INITIALIZE_AT_BOOT
+  bool "Initialize the UARTI subsystem automacitlly"
+  default y
+
+config UARTI_INIT_PRIORITY
+  int "Initialization priority"
+  default 80
+  range 0 99
+
+endif # UARTI

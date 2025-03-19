@@ -1,0 +1,14 @@
+description: GPIO pin to trigger capacitive touch
+
+compatible: "gpio-trigger"
+
+include: base.yaml
+
+child-binding:
+  description: GPIO trigger child node
+  properties:
+    gpios:
+      type: phandle-array
+      required: true
+      description: |
+        The GPIO connected to the capacitive touch optocoupler.

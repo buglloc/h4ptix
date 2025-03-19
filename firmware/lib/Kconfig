@@ -1,0 +1,5 @@
+menu "HM libraries"
+
+rsource "uarti/Kconfig"
+
+endmenu

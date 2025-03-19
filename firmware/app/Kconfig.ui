@@ -1,0 +1,35 @@
+menuconfig APP_UI
+  bool "UI config"
+  default y
+
+if APP_UI
+
+menuconfig APP_UI_LED
+  bool "LED"
+  default y
+
+if APP_UI_LED
+
+choice
+  prompt "Pattern"
+  default APP_UI_LED_MOSAIC
+
+config APP_UI_LED_STATIC
+  bool "Static"
+
+config APP_UI_LED_MOSAIC
+  bool "Mosaic"
+
+endchoice # APP_UI_LED
+
+config APP_UI_STATIC_LED_COLOR
+  hex "Color for status LED (uint32)"
+  default 0x770737
+
+config APP_UI_LED_BRIGHTNESS
+  hex "LED brightness from 0 to 100"
+  default 10
+
+endif # APP_UI_LED
+
+endif # APP_UI

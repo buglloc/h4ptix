@@ -1,0 +1,15 @@
+menuconfig GPIO_TRIGGER
+  bool "GPIO trigger"
+  default y
+
+if GPIO_TRIGGER
+
+module = GPIO_TRIGGER
+module-str = gpio-trigger
+source "subsys/logging/Kconfig.template.log_config"
+
+config GPIO_TRIGGER_INIT_PRIORITY
+  int "Trigger initialization priority"
+  default 90
+
+endif # GPIO_TRIGGER

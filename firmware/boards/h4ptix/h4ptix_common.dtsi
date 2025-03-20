@@ -25,26 +25,6 @@
     rtc = &rtc;
     watchdog0 = &wdt0;
   };
-
-  triggers: gpio_trigger {
-    compatible = "gpio-trigger";
-
-    trigger0 {
-      gpios = <&gpio0 15 GPIO_ACTIVE_HIGH>;
-    };
-
-    trigger1 {
-      gpios = <&gpio0 14 GPIO_ACTIVE_HIGH>;
-    };
-
-    trigger2 {
-      gpios = <&gpio0 7 GPIO_ACTIVE_HIGH>;
-    };
-
-    trigger3 {
-      gpios = <&gpio0 8 GPIO_ACTIVE_HIGH>;
-    };
-  };
 };
 
 &flash0 {

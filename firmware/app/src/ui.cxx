@@ -4,13 +4,13 @@
 #include <random>
 
 #include <zephyr/kernel.h>
+#include <zephyr/spinlock.h>
 #include <zephyr/logging/log.h>
 
 #include <zephyr/device.h>
 #include <zephyr/sys/util.h>
 
 #include <zephyr/drivers/led_strip.h>
-#include <zephyr/random/random.h>
 
 #include "ui.h"
 
@@ -39,6 +39,22 @@ namespace {
       .g = static_cast<uint8_t>(((c >> 8)  & 0xFF) * CONFIG_APP_UI_LED_BRIGHTNESS / 100),
       .b = static_cast<uint8_t>(((c >> 0)  & 0xFF) * CONFIG_APP_UI_LED_BRIGHTNESS / 100),
     };
+  }
+
+  inline uint32_t rand32(void)
+  {
+    static struct k_spinlock rand32_lock;
+
+    /* initial seed value */
+    static uint64_t state = (uint64_t)1337;
+    k_spinlock_key_t key = k_spin_lock(&rand32_lock);
+
+    state = state + k_cycle_get_32();
+    state = state * 2862933555777941757ULL + 3037000493ULL;
+    uint32_t val = (uint32_t)(state >> 32);
+
+    k_spin_unlock(&rand32_lock, key);
+    return val;
   }
 }
 
@@ -78,7 +94,7 @@ void UI::MosaicLED::fillFreePixels()
   std::shuffle(
     this->freePixels_.begin(),
     this->freePixels_.end(),
-    std::default_random_engine(sys_rand16_get())
+    std::default_random_engine(rand32())
   );
 }
 

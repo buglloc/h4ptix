@@ -1,5 +1,28 @@
 /dts-v1/;
+
 #include "h4ptix_common.dtsi"
+
+/ {
+  triggers: gpio_trigger {
+    compatible = "gpio-trigger";
+
+    trigger0 {
+      gpios = <&gpio0 7 GPIO_ACTIVE_HIGH>;
+    };
+
+    trigger1 {
+      gpios = <&gpio0 14 GPIO_ACTIVE_HIGH>;
+    };
+
+    trigger2 {
+      gpios = <&gpio0 15 GPIO_ACTIVE_HIGH>;
+    };
+
+    trigger3 {
+      gpios = <&gpio0 8 GPIO_ACTIVE_HIGH>;
+    };
+  };
+};
 
 &pinctrl {
   ws2812_pio0_default: ws2812_pio0_default {

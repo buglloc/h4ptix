@@ -13,10 +13,10 @@ west update
 ```
 3. Build:
 ```bash
-west build -b h4ptix/rp2040/matrix app
+west build -b h4ptix/rp2040/basic app
 ```
 
 Available boards:
-  - `h4ptix/rp2040` - basic board
-  - `h4ptix/rp2040/matrix` - rp2040 with LED matrix
+  - `h4ptix/rp2040/basic` - basic board
+  - `h4ptix/rp2040/matrix` - with LED matrix
   - `h4ptix/rp2040/hub` - USB hub

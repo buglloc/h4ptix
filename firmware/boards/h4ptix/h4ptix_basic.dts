@@ -7,7 +7,7 @@
     compatible = "gpio-trigger";
 
     trigger0 {
-      gpios = <&gpio0 7 GPIO_ACTIVE_HIGH>;
+      gpios = <&gpio0 26 GPIO_ACTIVE_HIGH>;
     };
 
     trigger1 {
@@ -19,7 +19,7 @@
     };
 
     trigger3 {
-      gpios = <&gpio0 8 GPIO_ACTIVE_HIGH>;
+      gpios = <&gpio0 27 GPIO_ACTIVE_HIGH>;
     };
   };
 };

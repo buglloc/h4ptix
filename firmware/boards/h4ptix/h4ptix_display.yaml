@@ -1,5 +1,5 @@
-identifier: h4ptix/rp2040/matrix
-name: H4ptiX Matrix
+identifier: h4ptix/rp2040/display
+name: H4ptiX Display
 type: mcu
 arch: arm
 flash: 2048

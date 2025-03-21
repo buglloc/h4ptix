@@ -86,7 +86,6 @@ static void uart_tx_handle(const struct device *dev)
     return;
   }
 
-  LOG_INF("tx3");
   len = uart_fifo_fill(dev, data, len);
   err = ring_buf_get_finish(&tx_ringbuf_, len);
   if (err) {

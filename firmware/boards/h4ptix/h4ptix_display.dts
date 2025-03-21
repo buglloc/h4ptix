@@ -1,0 +1,41 @@
+/dts-v1/;
+
+#include "h4ptix_basic.dts"
+#include <dt-bindings/pinctrl/rpi-pico-rp2040-pinctrl.h>
+#include <dt-bindings/i2c/i2c.h>
+
+&pinctrl {
+  i2c0_default: i2c0_default {
+    group1 {
+      pinmux = <I2C0_SDA_P4>;
+      input-enable;
+    };
+    group2 {
+      pinmux = <I2C0_SCL_P5>;
+      input-enable;
+    };
+  };
+};
+
+&i2c0 {
+  status = "okay";
+  pinctrl-0 = <&i2c0_default>;
+  pinctrl-names = "default";
+  clock-frequency = <I2C_BITRATE_FAST>;
+
+  ssd1306: ssd1306@3c {
+    compatible = "solomon,ssd1306fb";
+    label = "SSD1306";
+    reg = <0x3c>;
+    width = <128>;
+    height = <64>;
+    segment-offset = <0>;
+    page-offset = <0>;
+    display-offset = <0>;
+    multiplex-ratio = <31>;
+    prechargep      = <0xD1>;
+    segment-remap;
+    com-invdir;
+    // ready-time-ms = <200>;
+  };
+};

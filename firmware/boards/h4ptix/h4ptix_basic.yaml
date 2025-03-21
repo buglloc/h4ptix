@@ -1,5 +1,5 @@
-identifier: h4ptix
-name: H4ptiX
+identifier: h4ptix/rp2040/basic
+name: H4ptiX Basic
 type: mcu
 arch: arm
 flash: 2048

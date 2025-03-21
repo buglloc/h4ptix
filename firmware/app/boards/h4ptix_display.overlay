@@ -1,0 +1,11 @@
+/ {
+  aliases {
+    ui-led = &ws2812;
+  };
+
+  chosen {
+    zephyr,console = &uart0;
+    zephyr,display = &ssd1306;
+    utbdk,uarti-dev = &cdc_acm_uart0;
+  };
+};

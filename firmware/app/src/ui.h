@@ -56,6 +56,13 @@ namespace H4X::UI {
     std::vector<size_t> freePixels_{};
   };
 
+  class Display {
+  public:
+    Display();
+
+  protected:
+  };
+
   int Init();
   void OnTrigger(size_t port);
 }

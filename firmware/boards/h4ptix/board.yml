@@ -4,5 +4,6 @@ board:
   socs:
   - name: rp2040
     variants:
-    - name: 'basic'
-    - name: 'matrix'
+    - name: basic
+    - name: display
+    - name: matrix

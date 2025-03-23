@@ -4,6 +4,14 @@ menuconfig APP_TRIGGER
 
 if APP_TRIGGER
 
+config APP_TRIGGER_CHAN_ID
+  int "Trigger channel id"
+  default 31337
+
+config APP_TRIGGER_CHAN_PUB_TIMEOUT
+  int "Trigger channel pub timeout (ms)"
+  default 250
+
 config APP_TRIGGER_DEFAULT_DURATION
   int "Trigger default duration (ms)"
   default 500

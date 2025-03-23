@@ -28,5 +28,6 @@ namespace H4X::Trigger {
   };
 
   int Init();
+  size_t Size();
   ErrorCode Trigger(size_t port, size_t duration = CONFIG_APP_TRIGGER_DEFAULT_DURATION);
 }

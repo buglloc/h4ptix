@@ -4,6 +4,18 @@ menuconfig APP_UI
 
 if APP_UI
 
+config APP_UI_SUB_QUEUE_SIZE
+  int "UI subscriber queue size"
+  default 4
+
+config APP_UI_THREAD_STACK_SIZE
+  int "UI thread stack size"
+  default 4096
+
+config APP_UI_THREAD_PRIORITY
+  int "UI thread priority"
+  default 5
+
 menuconfig APP_UI_LED
   bool "LED"
   default y

@@ -2,12 +2,18 @@
 
 #include <zephyr/kernel.h>
 #include <zephyr/logging/log.h>
+#include <zephyr/sys/atomic_c.h>
+#include <zephyr/zbus/zbus.h>
+
+#include "app/drivers/gpio_trigger.h"
 
 #include "trigger.h"
-#include "app/drivers/gpio_trigger.h"
-#include "zephyr/sys/atomic_c.h"
+#include "messages.h"
+
 
 LOG_MODULE_DECLARE(app, CONFIG_APP_LOG_LEVEL);
+
+ZBUS_CHAN_DECLARE(trigger_chan);
 
 using namespace H4X;
 
@@ -32,6 +38,11 @@ int Trigger::Init()
   }
 
   return 0;
+}
+
+size_t Trigger::Size()
+{
+  return ports_.size();
 }
 
 Trigger::ErrorCode Trigger::Trigger(size_t port, size_t duration)
@@ -67,6 +78,11 @@ Trigger::ErrorCode Trigger::Port::On(size_t duration)
     return Trigger::ErrorCode::Internal;
   }
 
+  TriggerMsg msg = {
+    .Port = this->port_,
+    .On = true,
+  };
+  zbus_chan_pub(&trigger_chan, &msg, K_MSEC(CONFIG_APP_TRIGGER_CHAN_PUB_TIMEOUT));
   k_work_schedule(&this->dwork_, K_MSEC(duration));
   return Trigger::ErrorCode::None;
 }
@@ -76,6 +92,12 @@ Trigger::ErrorCode Trigger::Port::Off()
   if (atomic_set(&this->busy_, 0) == 0) {
     return Trigger::ErrorCode::None;
   }
+
+  TriggerMsg msg = {
+    .Port = this->port_,
+    .On = false,
+  };
+  zbus_chan_pub(&trigger_chan, &msg, K_MSEC(CONFIG_APP_TRIGGER_CHAN_PUB_TIMEOUT));
 
   int err = gpio_trigger_off(this->dev_, this->port_);
   if (err) {

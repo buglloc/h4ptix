@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/buglloc/h4ptix/software/haptix"
+	"github.com/buglloc/h4ptix/software/h4ptix"
 	"github.com/spf13/cobra"
 )
 

@@ -5,6 +5,7 @@
 
 #include <zephyr/kernel.h>
 #include <zephyr/logging/log.h>
+#include <zephyr/zbus/zbus.h>
 
 #include <app/vendor/json.h>
 
@@ -13,8 +14,17 @@
 #include <app_version.h>
 #include "ui.h"
 #include "trigger.h"
+#include "messages.h"
 
 LOG_MODULE_REGISTER(app);
+
+ZBUS_CHAN_DEFINE(trigger_chan,
+  TriggerMsg,
+  NULL,
+  NULL,
+  ZBUS_OBSERVERS(ui_trigger_subscriber),
+  ZBUS_MSG_INIT(.Port = 0, .On = false)
+);
 
 namespace {
   constexpr std::string_view kDefaultErrMsg = "ship happens";
@@ -90,7 +100,6 @@ namespace {
           );
           switch (err) {
           case H4X::Trigger::ErrorCode::None:
-            H4X::UI::OnTrigger(port);
             break;
           case H4X::Trigger::ErrorCode::PortInvalid:
             buildError(kErrCodePortInvalid, "requested invalid port", rsp);
@@ -158,7 +167,7 @@ int main(void)
     return 1;
   }
 
-  err = H4X::UI::Init();
+  err = H4X::UI::Init(H4X::Trigger::Size());
   if (err) {
     LOG_ERR("unable to initialize UI: %d", err);
     return 1;

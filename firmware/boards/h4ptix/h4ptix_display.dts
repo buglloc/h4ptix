@@ -32,10 +32,10 @@
     segment-offset = <0>;
     page-offset = <0>;
     display-offset = <0>;
-    multiplex-ratio = <31>;
-    prechargep      = <0xD1>;
+    multiplex-ratio = <63>;
+    prechargep = <0x22>;
     segment-remap;
     com-invdir;
-    // ready-time-ms = <200>;
+    ready-time-ms = <300>;
   };
 };

@@ -1,4 +1,4 @@
-module github.com/buglloc/h4ptix/software/haptix
+module github.com/buglloc/h4ptix/software/h4ptix
 
 go 1.24.0
 

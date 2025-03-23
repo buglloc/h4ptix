@@ -10,4 +10,15 @@ PRIVATE
   src/main.cxx
   src/trigger.cxx
   src/ui.cxx
+  src/ui/led.cxx
+
 )
+
+target_sources_ifdef(
+  CONFIG_DISPLAY
+  app PRIVATE src/ui/display.cxx
+)
+
+include(${ZEPHYR_BASE}/cmake/cfb.cmake NO_POLICY_SCOPE)
+set(gen_dir ${ZEPHYR_BINARY_DIR}/include/generated/)
+generate_cfb_font_for_target(app fonts/PressStart2P-Regular.ttf ${gen_dir}/cfb_ui.h 12 16 --type font --size 12)

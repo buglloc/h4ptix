@@ -121,19 +121,19 @@ func convertSerialErr(err error) error {
 	switch portErr.Code() {
 	case serial.PortNotFound, serial.PortClosed:
 		return &Error{
-			Code: ErrNoDev,
+			Code: ErrorCodeNoDev,
 			Msg:  portErr.Error(),
 		}
 
 	case serial.PermissionDenied:
 		return &Error{
-			Code: ErrNoPerm,
+			Code: ErrorCodeNoPerm,
 			Msg:  portErr.Error(),
 		}
 
 	case serial.PortBusy:
 		return &Error{
-			Code: ErrDevBusy,
+			Code: ErrorCodeDevBusy,
 			Msg:  portErr.Error(),
 		}
 

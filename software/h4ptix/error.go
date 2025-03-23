@@ -14,9 +14,9 @@ const (
 	ErrorCodePortInvalid  ErrorCode = 0x04
 	ErrorCodePortBusy     ErrorCode = 0x05
 
-	ErrNoDev   ErrorCode = 0xFF01
-	ErrNoPerm  ErrorCode = 0xFF01
-	ErrDevBusy ErrorCode = 0xFF02
+	ErrorCodeNoDev   ErrorCode = 0xFF01
+	ErrorCodeNoPerm  ErrorCode = 0xFF02
+	ErrorCodeDevBusy ErrorCode = 0xFF03
 )
 
 type Error struct {
@@ -57,6 +57,8 @@ func (e *Error) Error() string {
 func (e *Error) IsPermanent() bool {
 	switch e.Code {
 	case ErrorCodeNone, ErrorCodeInternal, ErrorCodePortBusy:
+		return true
+	case ErrorCodeNoDev, ErrorCodeNoPerm:
 		return true
 	}
 

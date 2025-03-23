@@ -43,34 +43,34 @@ int Display::Initialize()
 {
   int err = 0;
   err = display_set_pixel_format(this->dev_, PIXEL_FORMAT_MONO10);
-	if (err) {
+  if (err) {
     err = display_set_pixel_format(this->dev_, PIXEL_FORMAT_MONO01);
-		if (err) {
+    if (err) {
       LOG_ERR("Failed to set required pixel format: %d", err);
-			return err;
-		}
-	}
+      return err;
+    }
+  }
 
   err = display_blanking_off(this->dev_);
   if (err) {
-		LOG_ERR("Failed to turn off display blanking: %d", err);
-		return err;
-	}
+    LOG_ERR("Failed to turn off display blanking: %d", err);
+    return err;
+  }
 
   err = cfb_framebuffer_init(this->dev_);
-	if (err) {
+  if (err) {
     LOG_ERR("Could not initialize framebuffer: %d", err);
     return err;
-	}
+  }
 
   cfb_set_kerning(this->dev_, kFontKerning);
   this->width_ = cfb_get_display_parameter(this->dev_, CFB_DISPLAY_WIDTH);
   this->height_ = cfb_get_display_parameter(this->dev_, CFB_DISPLAY_HEIGH);
   err = cfb_get_font_size(this->dev_, 0, &this->font_width_, &this->font_height_);
-	if (err) {
+  if (err) {
     LOG_ERR("Could not get font dimensions: %d", err);
     return err;
-	}
+  }
 
   return this->Draw(false);
 }
@@ -144,9 +144,9 @@ uint16_t Display::DrawHeader(bool on)
 int Display::Clear()
 {
   int err = cfb_framebuffer_clear(this->dev_, true);
-	if (err) {
+  if (err) {
     LOG_ERR("Could not clear framebuffer: %d", err);
-	}
+  }
 
   return err;
 }
@@ -154,9 +154,9 @@ int Display::Clear()
 int Display::Flush()
 {
   int err = cfb_framebuffer_finalize(this->dev_);
-	if (err) {
+  if (err) {
     LOG_ERR("Could not finalize framebuffer: %d", err);
-	}
+  }
 
   return err;
 }

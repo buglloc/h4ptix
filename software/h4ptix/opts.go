@@ -1,4 +1,4 @@
-package haptix
+package h4ptix
 
 type Option interface {
 	isOption()
@@ -6,10 +6,10 @@ type Option interface {
 
 type optDevice struct {
 	Option
-	dev *Device
+	dev Device
 }
 
-func WithDevice(dev *Device) Option {
+func WithDevice(dev Device) Option {
 	return optDevice{
 		dev: dev,
 	}

@@ -1,4 +1,4 @@
-package haptix
+package h4ptix
 
 import (
 	"encoding"
@@ -93,8 +93,8 @@ func (m *HwMsg[T]) UnmarshalJSON(in []byte) error {
 
 	case MsgKindErr:
 		var body struct {
-			Code HwErrorCode `json:"code"`
-			Msg  string      `json:"msg"`
+			Code ErrorCode `json:"code"`
+			Msg  string    `json:"msg"`
 		}
 		if err := json.Unmarshal(box.Body, &body); err != nil {
 			return fmt.Errorf("invalid body: %w", err)

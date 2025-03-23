@@ -4,8 +4,9 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/buglloc/h4ptix/software/h4ptix"
 	"github.com/spf13/cobra"
+
+	"github.com/buglloc/h4ptix/software/h4ptix"
 )
 
 var triggerArgs struct {
@@ -24,14 +25,14 @@ var triggerCmd = &cobra.Command{
 			return fmt.Errorf("must specify a port to trigger on")
 		}
 
-		var opts []haptix.Option
+		var opts []h4ptix.Option
 		if triggerArgs.devPath != "" {
-			opts = append(opts, haptix.WithDevicePath(
+			opts = append(opts, h4ptix.WithDevicePath(
 				triggerArgs.devPath,
 			))
 		}
 
-		h, err := haptix.NewHaptix(opts...)
+		h, err := h4ptix.NewH4ptix(opts...)
 		if err != nil {
 			return fmt.Errorf("create haptix: %w", err)
 		}

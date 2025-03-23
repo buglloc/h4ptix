@@ -1,4 +1,4 @@
-package haptix
+package h4ptix
 
 import (
 	"bufio"
@@ -8,22 +8,22 @@ import (
 	"time"
 )
 
-var _ Trigger = (*Haptix)(nil)
+var _ Trigger = (*H4ptix)(nil)
 
-type Haptix struct {
-	dev    *Device
+type H4ptix struct {
+	dev    Device
 	reader *bufio.Scanner
 }
 
-func NewHaptix(opts ...Option) (*Haptix, error) {
-	h := &Haptix{}
+func NewH4ptix(opts ...Option) (*H4ptix, error) {
+	h := &H4ptix{}
 	for _, opt := range opts {
 		switch v := opt.(type) {
 		case optDevice:
 			h.dev = v.dev
 
 		case optDevicePath:
-			h.dev = &Device{
+			h.dev = &SerialDevice{
 				path: v.path,
 			}
 
@@ -33,7 +33,7 @@ func NewHaptix(opts ...Option) (*Haptix, error) {
 	}
 
 	if h.dev == nil {
-		dev, err := FirstDevice()
+		dev, err := FirstSerialDevice()
 		if err != nil {
 			return nil, fmt.Errorf("unable to find device: %w", err)
 		}
@@ -44,18 +44,11 @@ func NewHaptix(opts ...Option) (*Haptix, error) {
 	return h, nil
 }
 
-func (h *Haptix) Open() error {
+func (h *H4ptix) Open() error {
 	return h.dev.Open()
 }
 
-func (h *Haptix) Trigger(port int, duration time.Duration) error {
-	if !h.dev.IsOpened() {
-		if err := h.Open(); err != nil {
-			return fmt.Errorf("open device: %w", err)
-		}
-		defer func() { _ = h.dev.Close() }()
-	}
-
+func (h *H4ptix) Trigger(port int, duration time.Duration) error {
 	var rsp HwMsg[BodyAck]
 	return h.roundTrip(
 		HwMsg[BodyTrigger]{
@@ -69,7 +62,14 @@ func (h *Haptix) Trigger(port int, duration time.Duration) error {
 	)
 }
 
-func (h *Haptix) roundTrip(req any, rsp any) error {
+func (h *H4ptix) roundTrip(req any, rsp any) error {
+	if !h.dev.IsOpened() {
+		if err := h.Open(); err != nil {
+			return fmt.Errorf("open device: %w", err)
+		}
+		defer func() { _ = h.dev.Close() }()
+	}
+
 	reqBytes, err := json.Marshal(req)
 	if err != nil {
 		return fmt.Errorf("invalid request: %w", err)
@@ -102,6 +102,6 @@ func (h *Haptix) roundTrip(req any, rsp any) error {
 	return nil
 }
 
-func (h *Haptix) Close() error {
+func (h *H4ptix) Close() error {
 	return h.dev.Close()
 }

@@ -1,34 +1,38 @@
-package haptix
+package h4ptix
 
 import (
 	"fmt"
 )
 
-type HwErrorCode uint32
+type ErrorCode uint32
 
 const (
-	HwErrorCodeNone         HwErrorCode = 0x00
-	HwErrorCodeNotSupported HwErrorCode = 0x01
-	HwErrorCodeInternal     HwErrorCode = 0x02
-	HwErrorCodeInvalidReq   HwErrorCode = 0x03
-	HwErrorCodePortInvalid  HwErrorCode = 0x04
-	HwErrorCodePortBusy     HwErrorCode = 0x05
+	ErrorCodeNone         ErrorCode = 0x00
+	ErrorCodeNotSupported ErrorCode = 0x01
+	ErrorCodeInternal     ErrorCode = 0x02
+	ErrorCodeInvalidReq   ErrorCode = 0x03
+	ErrorCodePortInvalid  ErrorCode = 0x04
+	ErrorCodePortBusy     ErrorCode = 0x05
+
+	ErrNoDev   ErrorCode = 0xFF01
+	ErrNoPerm  ErrorCode = 0xFF01
+	ErrDevBusy ErrorCode = 0xFF02
 )
 
-type HwError struct {
-	Code HwErrorCode
+type Error struct {
+	Code ErrorCode
 	Msg  string
 }
 
-func NewError(code HwErrorCode, msg string) *HwError {
-	return &HwError{
+func NewError(code ErrorCode, msg string) *Error {
+	return &Error{
 		Code: code,
 		Msg:  msg,
 	}
 }
 
-func (e *HwError) Is(err error) bool {
-	o, ok := err.(*HwError)
+func (e *Error) Is(err error) bool {
+	o, ok := err.(*Error)
 	if !ok {
 		return false
 	}
@@ -43,16 +47,16 @@ func (e *HwError) Is(err error) bool {
 	return e.Code == o.Code
 }
 
-func (e *HwError) Error() string {
+func (e *Error) Error() string {
 	if e.Msg == "" {
 		return fmt.Sprintf("HwError[%d]", e.Code)
 	}
 	return fmt.Sprintf("HwError[%d]: %s", e.Code, e.Msg)
 }
 
-func (e *HwError) IsPermanent() bool {
+func (e *Error) IsPermanent() bool {
 	switch e.Code {
-	case HwErrorCodeNone, HwErrorCodeInternal, HwErrorCodePortBusy:
+	case ErrorCodeNone, ErrorCodeInternal, ErrorCodePortBusy:
 		return true
 	}
 

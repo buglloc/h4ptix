@@ -1,4 +1,4 @@
-package haptix
+package h4ptix
 
 import "time"
 

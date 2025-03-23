@@ -1,9 +1,9 @@
-module github.com/buglloc/h4ptix/software/haptix/example
+module github.com/buglloc/h4ptix/software/h4ptix/example
 
 go 1.24.0
 
 require (
-	github.com/buglloc/h4ptix/software/haptix v0.0.9
+	github.com/buglloc/h4ptix/software/h4ptix v0.0.9
 	github.com/spf13/cobra v1.9.1
 )
 
@@ -15,4 +15,4 @@ require (
 	golang.org/x/sys v0.19.0 // indirect
 )
 
-replace github.com/buglloc/h4ptix/software/haptix => ../
+replace github.com/buglloc/h4ptix/software/h4ptix => ../

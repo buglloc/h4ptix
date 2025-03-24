@@ -1,6 +1,6 @@
 module github.com/buglloc/h4ptix/software/h4ptix
 
-go 1.24.0
+go 1.23.0
 
 require go.bug.st/serial v1.6.3
 

@@ -1,6 +1,6 @@
 module github.com/buglloc/h4ptix/software/h4ptix/example
 
-go 1.24.0
+go 1.23.0
 
 require (
 	github.com/buglloc/h4ptix/software/h4ptix v0.0.9

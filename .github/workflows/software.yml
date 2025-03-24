@@ -1,0 +1,82 @@
+---
+name: Sofrware CI
+
+on:
+  push:
+    branches:
+      - main
+    tags:
+      - '*'
+    paths:
+      - 'software/**'
+      - '.github/workflows/software.yml'
+  pull_request:
+    paths:
+      - 'software/**'
+      - '.github/workflows/software.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  staticcheck:
+    permissions:
+      contents: read
+      pull-requests: read
+    runs-on: ubuntu-latest
+    steps:
+      # Get the repositery's code
+      - name: Checkout
+        uses: actions/checkout@v3
+
+      - name: Set up Golang
+        uses: actions/setup-go@v4
+        with:
+          go-version: '1.23.x'
+          check-latest: true
+          cache: true
+          cache-dependency-path: software/go.sum
+
+      - name: Go test
+        working-directory: ./software/h4ptix
+        run: "go test ./..."
+
+      - name: Go ver
+        working-directory: ./software/h4ptix
+        run: "go vet ./..."
+
+      - name: StaticCheck
+        uses: dominikh/staticcheck-action@v1.3.1
+        with:
+          version: "2025.1"
+          install-go: false
+          working-directory: ./software/h4ptix
+
+  test:
+    strategy:
+      fail-fast: false
+      matrix:
+        platform:
+          - ubuntu
+        go:
+          - 23
+          - 24
+    name: 'tests on ${{ matrix.platform }} | 1.${{ matrix.go }}.x'
+    runs-on: ${{ matrix.platform }}-latest
+    steps:
+      # Get the repositery's code
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Golang
+        uses: actions/setup-go@v4
+        with:
+          go-version: '1.${{ matrix.go }}.x'
+          check-latest: true
+          cache: true
+          cache-dependency-path: ./software/h4ptix/go.sum
+
+      - name: Run tests
+        working-directory: ./software/h4ptix
+        run: "go clean -testcache && go test -race -cover -covermode=atomic ./..."

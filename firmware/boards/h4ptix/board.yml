@@ -7,4 +7,3 @@ board:
     - name: basic
     - name: lonely
     - name: display
-    - name: matrix

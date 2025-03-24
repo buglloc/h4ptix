@@ -75,8 +75,8 @@ namespace {
 
   #if CONFIG_APP_UI_LED_STATIC
     led_ = new UI::StaticLED(dev, numLeds);
-  #elif CONFIG_APP_UI_LED_MOSAIC
-    led_ = new UI::MosaicLED(dev, numLeds);
+  #elif CONFIG_APP_UI_LED_BLINKY
+    led_ = new UI::BlinkyLED(dev, numLeds);
   #else
     LOG_ERR("no led pattern configured :/");
   #endif

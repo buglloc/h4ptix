@@ -24,21 +24,21 @@ if APP_UI_LED
 
 choice
   prompt "Pattern"
-  default APP_UI_LED_STATIC
+  default APP_UI_LED_BLINKY
 
 config APP_UI_LED_STATIC
   bool "Static"
 
-config APP_UI_LED_MOSAIC
-  bool "Mosaic"
+config APP_UI_LED_BLINKY
+  bool "Blinky"
 
 endchoice # APP_UI_LED
 
-config APP_UI_STATIC_LED_ACTIVE_COLOR
+config APP_UI_LED_ACTIVE_COLOR
   hex "Color for active LED (uint32)"
   default 0x770737
 
-config APP_UI_STATIC_LED_INACTIVE_COLOR
+config APP_UI_LED_INACTIVE_COLOR
   hex "Color for inactive LED (uint32)"
   default 0x070e77
 

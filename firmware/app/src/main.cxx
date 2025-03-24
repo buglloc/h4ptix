@@ -96,7 +96,8 @@ namespace {
           --port;
           H4X::Trigger::ErrorCode err = H4X::Trigger::Trigger(
             port,
-            req["duration"].as<size_t>()
+            req["duration"].as<size_t>(),
+            req["delay"].as<size_t>()
           );
           switch (err) {
           case H4X::Trigger::ErrorCode::None:

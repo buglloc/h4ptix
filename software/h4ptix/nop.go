@@ -1,7 +1,5 @@
 package h4ptix
 
-import "time"
-
 var _ Trigger = (*NopHaptix)(nil)
 
 type NopHaptix struct{}
@@ -10,7 +8,7 @@ func NewNopHaptix() *NopHaptix {
 	return &NopHaptix{}
 }
 
-func (h *NopHaptix) Trigger(_ int, _ time.Duration) error {
+func (h *NopHaptix) Trigger(_ TriggerReq) error {
 	return nil
 }
 

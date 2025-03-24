@@ -110,6 +110,7 @@ func (m *HwMsg[T]) UnmarshalJSON(in []byte) error {
 type BodyTrigger struct {
 	Port     int   `json:"port"`
 	Duration int64 `json:"duration,omitempty"`
+	Delay    int64 `json:"delay,omitempty"`
 }
 
 type BodyAck struct {

@@ -6,9 +6,7 @@
 #include <zephyr/zbus/zbus.h>
 
 #include "ui/led.h"
-#if CONFIG_DISPLAY
 #include "ui/display.h"
-#endif
 
 #include "messages.h"
 
@@ -21,9 +19,37 @@ using namespace H4X;
 
 namespace {
   UI::LED* led_ = nullptr;
+#if CONFIG_DISPLAY
   UI::Display* dsp_ = nullptr;
+#endif
 
-  void ui_thread_task(void)
+  void ledWork(const TriggerMsg& msg)
+  {
+    if (led_ == nullptr) {
+      return;
+    }
+
+    int err = msg.On ? led_->TriggerOn(msg.Port) : led_->TriggerOff(msg.Port);
+    if (err) {
+      LOG_ERR("Unable to update LED by trigger: %d", err);
+    }
+  }
+
+  void displayWork(const TriggerMsg& msg)
+  {
+  #if CONFIG_DISPLAY
+    if (dsp_ == nullptr) {
+      return;
+    }
+
+    int err = msg.On ? dsp_->TriggerOn(msg.Port) : dsp_->TriggerOff(msg.Port);
+    if (err) {
+      LOG_ERR("Unable to update Display by trigger: %d", err);
+    }
+  #endif
+  }
+
+  void uiThreadTask(void)
   {
     const struct zbus_channel *chan;
 
@@ -31,20 +57,8 @@ namespace {
       TriggerMsg msg;
       zbus_chan_read(chan, &msg, K_MSEC(CONFIG_APP_TRIGGER_CHAN_PUB_TIMEOUT));
 
-      int err;
-      if (led_ != nullptr) {
-        err = msg.On ? led_->TriggerOn(msg.Port) : led_->TriggerOff(msg.Port);
-        if (err) {
-          LOG_ERR("Unable to update LED by trigger: %d", err);
-        }
-      }
-
-      if (dsp_ != nullptr) {
-        err = msg.On ? dsp_->TriggerOn(msg.Port) : dsp_->TriggerOff(msg.Port);
-        if (err) {
-          LOG_ERR("Unable to update Display by trigger: %d", err);
-        }
-      }
+      ledWork(msg);
+      displayWork(msg);
     }
   }
 
@@ -115,4 +129,4 @@ int UI::Init(size_t numPorts)
   return 0;
 }
 
-K_THREAD_DEFINE(ui_tid_, CONFIG_APP_UI_THREAD_STACK_SIZE, ui_thread_task, NULL, NULL, NULL, CONFIG_APP_UI_THREAD_PRIORITY, 0, 0);
+K_THREAD_DEFINE(ui_tid_, CONFIG_APP_UI_THREAD_STACK_SIZE, uiThreadTask, NULL, NULL, NULL, CONFIG_APP_UI_THREAD_PRIORITY, 0, 0);

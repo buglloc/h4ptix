@@ -21,9 +21,8 @@ const (
 var _ Device = (*SerialDevice)(nil)
 
 type SerialDevice struct {
-	path        string
-	readTimeout time.Duration
-	port        serial.Port
+	path string
+	port serial.Port
 }
 
 func FirstSerialDevice() (*SerialDevice, error) {

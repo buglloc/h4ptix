@@ -19,6 +19,10 @@ using namespace H4X;
 
 namespace {
   std::vector<Trigger::Port> ports_{};
+
+  constexpr size_t kStateIdle = 0;
+  constexpr size_t kStateWait = 1;
+  constexpr size_t kStateBusy = 2;
 }
 
 int Trigger::Init()
@@ -45,30 +49,65 @@ size_t Trigger::Size()
   return ports_.size();
 }
 
-Trigger::ErrorCode Trigger::Trigger(size_t port, size_t duration)
+Trigger::ErrorCode Trigger::Trigger(size_t port, size_t duration, size_t delay)
 {
   if (port >= ports_.size()) {
     return Trigger::ErrorCode::PortInvalid;
   }
 
-  return ports_[port].On(duration > 0 ? duration : CONFIG_APP_TRIGGER_DEFAULT_DURATION);
+  if (duration == 0) {
+    duration = CONFIG_APP_TRIGGER_DEFAULT_DURATION;
+  }
+
+  return ports_[port].Trigger(duration, delay);
 }
 
 Trigger::Port::Port(const struct device *dev, size_t port)
   : dev_(dev)
   , port_(port)
-  , busy_(ATOMIC_INIT(0))
+  , duration_(0)
+  , state_(ATOMIC_INIT(kStateIdle))
 {
   k_work_init_delayable(&this->dwork_, [](struct k_work* const item) {
     struct k_work_delayable* dwork = k_work_delayable_from_work(item);
     Port* port = CONTAINER_OF(dwork, Port, dwork_);
-    port->Off();
+    int state = atomic_get(&port->state_);
+    switch (state) {
+    case kStateIdle:
+      return;
+    case kStateWait:
+      port->On(port->duration_);
+      break;
+    case kStateBusy:
+      port->Off();
+      break;
+    default:
+      LOG_ERR("unexpected state: %d", state);
+      break;
+    }
   });
+
+  LOG_INF("Trigger port#%d initialized", this->port_);
 };
+
+Trigger::ErrorCode Trigger::Port::Trigger(size_t duration, size_t delay)
+{
+  if (duration == 0) {
+    return this->On(duration);
+  }
+
+  if (!atomic_cas(&this->state_, kStateIdle, kStateWait)) {
+    return Trigger::ErrorCode::PortBusy;
+  }
+
+  this->duration_ = duration;
+  k_work_schedule(&this->dwork_, K_MSEC(duration));
+  return Trigger::ErrorCode::None;
+}
 
 Trigger::ErrorCode Trigger::Port::On(size_t duration)
 {
-  if (atomic_set(&this->busy_, 1) == 1) {
+  if (atomic_set(&this->state_, kStateBusy) == kStateBusy) {
     return Trigger::ErrorCode::PortBusy;
   }
 
@@ -78,32 +117,35 @@ Trigger::ErrorCode Trigger::Port::On(size_t duration)
     return Trigger::ErrorCode::Internal;
   }
 
+  k_work_schedule(&this->dwork_, K_MSEC(duration));
+
+  this->duration_ = duration;
   TriggerMsg msg = {
     .Port = this->port_,
     .On = true,
   };
   zbus_chan_pub(&trigger_chan, &msg, K_MSEC(CONFIG_APP_TRIGGER_CHAN_PUB_TIMEOUT));
-  k_work_schedule(&this->dwork_, K_MSEC(duration));
   return Trigger::ErrorCode::None;
 }
 
 Trigger::ErrorCode Trigger::Port::Off()
 {
-  if (atomic_set(&this->busy_, 0) == 0) {
+  if (atomic_set(&this->state_, kStateIdle) == kStateIdle) {
     return Trigger::ErrorCode::None;
   }
-
-  TriggerMsg msg = {
-    .Port = this->port_,
-    .On = false,
-  };
-  zbus_chan_pub(&trigger_chan, &msg, K_MSEC(CONFIG_APP_TRIGGER_CHAN_PUB_TIMEOUT));
 
   int err = gpio_trigger_off(this->dev_, this->port_);
   if (err) {
     LOG_ERR("unable to deactivate port#%d: %d", this->port_, err);
     return Trigger::ErrorCode::Internal;
   }
+
+  this->duration_ = 0;
+  TriggerMsg msg = {
+    .Port = this->port_,
+    .On = false,
+  };
+  zbus_chan_pub(&trigger_chan, &msg, K_MSEC(CONFIG_APP_TRIGGER_CHAN_PUB_TIMEOUT));
 
   return ErrorCode::None;
 }

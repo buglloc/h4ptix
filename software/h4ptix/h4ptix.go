@@ -5,7 +5,6 @@ import (
 	"encoding/json"
 	"fmt"
 	"io"
-	"time"
 )
 
 var _ Trigger = (*H4ptix)(nil)
@@ -48,14 +47,15 @@ func (h *H4ptix) Open() error {
 	return h.dev.Open()
 }
 
-func (h *H4ptix) Trigger(port int, duration time.Duration) error {
+func (h *H4ptix) Trigger(req TriggerReq) error {
 	var rsp HwMsg[BodyAck]
 	return h.roundTrip(
 		HwMsg[BodyTrigger]{
 			Kind: MsgKindTrigger,
 			Body: BodyTrigger{
-				Port:     port,
-				Duration: duration.Milliseconds(),
+				Port:     req.Port,
+				Duration: req.Duration.Milliseconds(),
+				Delay:    req.Delay.Milliseconds(),
 			},
 		},
 		&rsp,

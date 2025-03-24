@@ -52,14 +52,16 @@ int StaticLED::TriggerOn(size_t port)
 {
   ARG_UNUSED(port);
 
-  std::fill_n(&this->pixels_[0], this->size_, hexToRGB(CONFIG_APP_UI_STATIC_LED_COLOR));
+  std::fill_n(&this->pixels_[0], this->size_, hexToRGB(CONFIG_APP_UI_STATIC_LED_ACTIVE_COLOR));
   return led_strip_update_rgb(this->dev_, this->pixels_, this->size_);
 }
 
 int StaticLED::TriggerOff(size_t port)
 {
   ARG_UNUSED(port);
-  return 0;
+
+  std::fill_n(&this->pixels_[0], this->size_, hexToRGB(CONFIG_APP_UI_STATIC_LED_INACTIVE_COLOR));
+  return led_strip_update_rgb(this->dev_, this->pixels_, this->size_);
 }
 
 void StaticLED::clear()
@@ -68,6 +70,12 @@ void StaticLED::clear()
 }
 
 int MosaicLED::TriggerOn(size_t port)
+{
+  ARG_UNUSED(port);
+  return 0;
+}
+
+int MosaicLED::TriggerOff(size_t port)
 {
   if (this->freePixels_.size() == 0) {
     this->fillFreePixels();

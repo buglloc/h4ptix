@@ -92,7 +92,7 @@ Trigger::Port::Port(const struct device *dev, size_t port)
 
 Trigger::ErrorCode Trigger::Port::Trigger(size_t duration, size_t delay)
 {
-  if (duration == 0) {
+  if (delay == 0) {
     return this->On(duration);
   }
 
@@ -101,7 +101,7 @@ Trigger::ErrorCode Trigger::Port::Trigger(size_t duration, size_t delay)
   }
 
   this->duration_ = duration;
-  k_work_schedule(&this->dwork_, K_MSEC(duration));
+  k_work_schedule(&this->dwork_, K_MSEC(delay));
   return Trigger::ErrorCode::None;
 }
 

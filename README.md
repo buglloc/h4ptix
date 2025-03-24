@@ -18,5 +18,6 @@ west build -b h4ptix/rp2040/display app
 
 Available boards:
   - `h4ptix/rp2040/basic` - basic board
+  - `h4ptix/rp2040/lonely` - lonely board
   - `h4ptix/rp2040/matrix` - with LED matrix
   - `h4ptix/rp2040/display` - with display

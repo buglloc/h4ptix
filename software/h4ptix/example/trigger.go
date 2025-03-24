@@ -13,6 +13,7 @@ var triggerArgs struct {
 	port     int
 	devPath  string
 	duration time.Duration
+	delay    time.Duration
 }
 
 var triggerCmd = &cobra.Command{
@@ -37,7 +38,11 @@ var triggerCmd = &cobra.Command{
 			return fmt.Errorf("create haptix: %w", err)
 		}
 
-		return h.Trigger(triggerArgs.port, triggerArgs.duration)
+		return h.Trigger(h4ptix.TriggerReq{
+			Port:     triggerArgs.port,
+			Duration: triggerArgs.duration,
+			Delay:    triggerArgs.delay,
+		})
 	},
 }
 
@@ -45,5 +50,6 @@ func init() {
 	flags := triggerCmd.PersistentFlags()
 	flags.IntVar(&triggerArgs.port, "port", 0, "Port number to trigger on")
 	flags.DurationVar(&triggerArgs.duration, "duration", 0, "Trigger duration")
+	flags.DurationVar(&triggerArgs.delay, "delay", 0, "Trigger delay")
 	flags.StringVar(&triggerArgs.devPath, "dev", "", "H4ptiX device to use")
 }

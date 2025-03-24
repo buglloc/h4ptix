@@ -51,6 +51,7 @@ namespace H4X::UI {
 
     ~MosaicLED() = default;
     virtual int TriggerOn(size_t port) override;
+    virtual int TriggerOff(size_t port) override;
 
   protected:
     void fillFreePixels();

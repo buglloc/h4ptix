@@ -81,7 +81,7 @@ namespace {
     LOG_ERR("no led pattern configured :/");
   #endif
 
-    int err = led_->TriggerOn(0);
+    int err = led_->TriggerOff(0);
     if (err) {
       LOG_ERR("Failed to initialize LED: %d", err);
       return err;

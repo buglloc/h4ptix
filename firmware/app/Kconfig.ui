@@ -24,7 +24,7 @@ if APP_UI_LED
 
 choice
   prompt "Pattern"
-  default APP_UI_LED_MOSAIC
+  default APP_UI_LED_STATIC
 
 config APP_UI_LED_STATIC
   bool "Static"
@@ -34,9 +34,13 @@ config APP_UI_LED_MOSAIC
 
 endchoice # APP_UI_LED
 
-config APP_UI_STATIC_LED_COLOR
-  hex "Color for status LED (uint32)"
+config APP_UI_STATIC_LED_ACTIVE_COLOR
+  hex "Color for active LED (uint32)"
   default 0x770737
+
+config APP_UI_STATIC_LED_INACTIVE_COLOR
+  hex "Color for inactive LED (uint32)"
+  default 0x070e77
 
 config APP_UI_LED_BRIGHTNESS
   hex "LED brightness from 0 to 100"

@@ -71,5 +71,5 @@ jobs:
         uses: svenstaro/upload-release-action@v2
         with:
           repo_token: "${{ secrets.PUBLISH_TOKEN }}"
-          draft: true
+          prerelease: true
           file: "out/${{ matrix.artifact }}"

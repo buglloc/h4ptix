@@ -8,11 +8,13 @@ cd h4ptix
 pip install pipenv
 pipenv install --dev
 pipenv shell
+cd firmware
 west packages pip --install
 west update
 ```
 3. Build:
 ```bash
+
 west build -b h4ptix/rp2040/display app
 ```
 

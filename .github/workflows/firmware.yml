@@ -24,10 +24,13 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        board:
-          - h4ptix/rp2040/lonely
-          - h4ptix/rp2040/basic
-          - h4ptix/rp2040/display
+        include:
+          - board: h4ptix/rp2040/lonely
+            artifact: h4ptix_rp2040_lonely.u2f
+          - board: h4ptix/rp2040/basic
+            artifact: h4ptix_rp2040_basic.u2f
+          - board: h4ptix/rp2040/display
+            artifact: h4ptix_rp2040_display.u2f
     name: 'build ${{ matrix.board }} board'
     permissions:
       contents: read
@@ -56,5 +59,25 @@ jobs:
         working-directory: firmware
         shell: bash
         run: |
-          rm -rf build
-          west build -b "${{ matrix.board }}" app
+          west build --pristine always -b "${{ matrix.board }}" app
+          mkdir -p out
+          mv build/zephyr/zephyr.uf2 "out/${{ matrix.artifact }}"
+
+      # - name: Upload artifacts
+      #   uses: actions/upload-artifact@v4
+      #   with:
+      #     name: firmware-${{ matrix.artifact }}
+      #     path: |
+      #       out/${{ matrix.artifact }}
+      #     if-no-files-found: error
+      # - name: Download artifacts
+      #   uses: actions/download-artifact@v3
+      #   if: "startsWith(github.ref, 'refs/tags/')"
+      #   with:
+      #     firmware-${{ matrix.artifact }}
+      - name: Attach firmware
+        if: "startsWith(github.ref, 'refs/tags/')"
+        uses: svenstaro/upload-release-action@v2
+        with:
+          draft: true
+          file: "out/${{ matrix.artifact }}"

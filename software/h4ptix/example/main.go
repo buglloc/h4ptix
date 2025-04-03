@@ -17,6 +17,7 @@ var rootCmd = &cobra.Command{
 func main() {
 	rootCmd.AddCommand(
 		triggerCmd,
+		partyCmd,
 	)
 
 	if err := rootCmd.Execute(); err != nil {

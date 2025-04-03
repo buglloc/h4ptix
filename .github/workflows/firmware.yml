@@ -37,6 +37,10 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v3
 
+      - name: Drop .west
+        shell: bash
+        run: rm -rf .west
+
       - name: Set up Python
         uses: actions/setup-python@v5
         with:

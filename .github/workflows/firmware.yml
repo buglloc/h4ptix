@@ -29,6 +29,9 @@ jobs:
           - board: h4ptix/rp2040/display
             artifact: h4ptix_rp2040_display.u2f
     name: 'build ${{ matrix.board }} board'
+    permissions:
+      contents: read
+      pull-requests: read
     runs-on: ubuntu-latest
     steps:
       - name: Checkout

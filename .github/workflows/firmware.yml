@@ -63,18 +63,18 @@ jobs:
           mkdir -p out
           mv build/zephyr/zephyr.uf2 "out/${{ matrix.artifact }}"
 
-      # - name: Upload artifacts
-      #   uses: actions/upload-artifact@v4
-      #   with:
-      #     name: firmware-${{ matrix.artifact }}
-      #     path: |
-      #       out/${{ matrix.artifact }}
-      #     if-no-files-found: error
-      # - name: Download artifacts
-      #   uses: actions/download-artifact@v3
-      #   if: "startsWith(github.ref, 'refs/tags/')"
-      #   with:
-      #     firmware-${{ matrix.artifact }}
+      - name: Upload artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: firmware-${{ matrix.artifact }}
+          path: |
+            out/${{ matrix.artifact }}
+          if-no-files-found: error
+      - name: Download artifacts
+        uses: actions/download-artifact@v3
+        if: "startsWith(github.ref, 'refs/tags/')"
+        with:
+          firmware-${{ matrix.artifact }}
       - name: Attach firmware
         if: "startsWith(github.ref, 'refs/tags/')"
         uses: svenstaro/upload-release-action@v2

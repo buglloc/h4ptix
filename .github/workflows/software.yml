@@ -1,5 +1,5 @@
 ---
-name: Sofrware CI
+name: Sofrware
 
 on:
   push:

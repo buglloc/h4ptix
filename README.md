@@ -32,7 +32,7 @@ Available builds:
   - `h4ptix_rp2040_display.u2f` - basic + display for 4 YubiKeys
 
 #### Benefits
-✔ **Eliminates manual MFA steps** in automated tests.
-✔ **Improves test coverage** for security-critical flows.
-✔ **Reduces flakiness** compared to software emulators.
-✔ **Cost-effective** compared to commercial  automation tools.
+  - **Eliminates manual MFA steps** in automated tests.
+  - **Improves test coverage** for security-critical flows.
+  - **Reduces flakiness** compared to software emulators.
+  - **Cost-effective** compared to commercial  automation tools.

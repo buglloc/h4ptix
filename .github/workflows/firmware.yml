@@ -1,5 +1,5 @@
 ---
-name: Sofrware CI
+name: Firmware
 
 on:
   push:
@@ -69,6 +69,7 @@ jobs:
   publish:
     name: Publish for ${{ matrix.artifact }}
     permissions:
+      contents: read
       contents: write
       packages: write
     runs-on: ubuntu-latest

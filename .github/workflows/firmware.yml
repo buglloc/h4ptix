@@ -90,5 +90,5 @@ jobs:
         if: "startsWith(github.ref, 'refs/tags/')"
         uses: svenstaro/upload-release-action@v2
         with:
-          prerelease: true
+          draft: true
           file: "${{ matrix.artifact }}"

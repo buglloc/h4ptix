@@ -83,6 +83,10 @@ func (d *Device) Close() error {
 	return convertHIDErr(d.dev.Close())
 }
 
+func (d *Device) Location() string {
+	return d.dev.Location()
+}
+
 func (d *Device) Send(report []byte) error {
 	return d.dev.SetOutputReport(0, report)
 }

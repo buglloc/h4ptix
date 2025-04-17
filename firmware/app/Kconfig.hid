@@ -1,0 +1,15 @@
+menuconfig APP_HID
+  bool "HID config"
+  default y
+
+if APP_HID
+
+config APP_HID_MAX_MSG_SIZE
+  int "Max message size"
+  default 64
+
+config APP_HID_QUEUE_SIZE
+  int "Message queue size"
+  default 8
+
+endif # APP_HID

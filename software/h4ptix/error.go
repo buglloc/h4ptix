@@ -2,29 +2,32 @@ package h4ptix
 
 import (
 	"fmt"
+
+	"github.com/buglloc/h4ptix/software/h4ptix/rpcpb"
 )
 
-type ErrorCode uint32
+type ErrorCode rpcpb.ErrCode
 
+// fwd
 const (
-	ErrorCodeNone         ErrorCode = 0x00
-	ErrorCodeNotSupported ErrorCode = 0x01
-	ErrorCodeInternal     ErrorCode = 0x02
-	ErrorCodeInvalidReq   ErrorCode = 0x03
-	ErrorCodePortInvalid  ErrorCode = 0x04
-	ErrorCodePortBusy     ErrorCode = 0x05
+	ErrorCodeNone           = rpcpb.ErrCode_ErrCodeNone
+	ErrorCodeInvalidCommand = rpcpb.ErrCode_ErrCodeInvalidCommand
+	ErrorCodeNotSupported   = rpcpb.ErrCode_ErrCodeNotSupported
+	ErrorCodeInternal       = rpcpb.ErrCode_ErrCodeInternal
+	ErrorCodeInvalidReq     = rpcpb.ErrCode_ErrCodeInvalidReq
+	ErrorCodePortInvalid    = rpcpb.ErrCode_ErrCodePortInvalid
+	ErrorCodePortBusy       = rpcpb.ErrCode_ErrCodePortBusy
 
-	ErrorCodeNoDev   ErrorCode = 0xFF01
-	ErrorCodeNoPerm  ErrorCode = 0xFF02
-	ErrorCodeDevBusy ErrorCode = 0xFF03
+	ErrorCodeNoDev   = rpcpb.ErrCode_ErrCodeNoDev
+	ErrorCodeDevBusy = rpcpb.ErrCode_ErrCodeDevBusy
 )
 
 type Error struct {
-	Code ErrorCode
+	Code rpcpb.ErrCode
 	Msg  string
 }
 
-func NewError(code ErrorCode, msg string) *Error {
+func NewError(code rpcpb.ErrCode, msg string) *Error {
 	return &Error{
 		Code: code,
 		Msg:  msg,
@@ -57,8 +60,8 @@ func (e *Error) Error() string {
 func (e *Error) IsPermanent() bool {
 	switch e.Code {
 	case ErrorCodeNone, ErrorCodeInternal, ErrorCodePortBusy:
-		return true
-	case ErrorCodeNoDev, ErrorCodeNoPerm:
+		return false
+	case ErrorCodeNoDev:
 		return true
 	}
 

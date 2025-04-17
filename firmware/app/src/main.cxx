@@ -1,4 +1,4 @@
-#include <cstddef>
+#include <cstdint>
 #include <string>
 #include <vector>
 #include <functional>
@@ -7,14 +7,16 @@
 #include <zephyr/logging/log.h>
 #include <zephyr/zbus/zbus.h>
 
-#include <app/vendor/json.h>
-
-#include <app/lib/uarti.h>
+#include <pb_encode.h>
+#include <pb_decode.h>
 
 #include <app_version.h>
 #include "ui.h"
+#include "hid.h"
 #include "trigger.h"
 #include "messages.h"
+#include "rpc.pb.h"
+
 
 LOG_MODULE_REGISTER(app);
 
@@ -27,128 +29,96 @@ ZBUS_CHAN_DEFINE(trigger_chan,
 );
 
 namespace {
-  constexpr std::string_view kDefaultErrMsg = "ship happens";
-  constexpr std::string_view kErrKind = "err";
-
-  constexpr uint8_t kErrCodeNotSupported  = 0x01;
-  constexpr uint8_t kErrCodeInternal              = 0x02;
-  constexpr uint8_t kErrCodeInvalidReq         = 0x03;
-  constexpr uint8_t kErrCodePortInvalid        = 0x04;
-  constexpr uint8_t kErrCodePortBusy            = 0x05;
-
-  void sendJson(const JsonObjectConst& msg)
+  void sendResponse(const rpcpb_Rsp &rsp)
   {
-    std::string data;
-    serializeJson(msg, data);
+    uint8_t buf[rpcpb_Rsp_size];
+    pb_ostream_t stream = pb_ostream_from_buffer(buf, sizeof(buf));
+    if (!pb_encode(&stream, rpcpb_Rsp_fields, &rsp)) {
+      LOG_WRN("unable to encode response");
+      return;
+    }
 
-    int err = uarti_push(data.data(), data.size());
+    int err = H4X::HID::Send(buf, stream.bytes_written);
     if (err) {
       LOG_ERR("unable to send response: %d", err);
     }
   }
 
-  void buildError(uint8_t code, std::string msg, JsonObject& dst)
+  void buildError(rpcpb_ErrCode code, rpcpb_Rsp &rsp)
   {
-    if (msg.empty()) {
-      msg = kDefaultErrMsg;
-    }
-
-    dst["kind"] = kErrKind;
-    JsonObject body = dst["body"].to<JsonObject>();
-    body["code"] = code;
-    body["msg"] = msg;
+    rsp.which_payload = rpcpb_Rsp_err_tag;
+    rsp.payload.err.code = code;
   }
 
-  void sendError(uint8_t code, std::string msg)
+  void sendError(rpcpb_ErrCode code, rpcpb_Rsp &rsp)
   {
-    LOG_WRN("unable to process request[%d]: %s", code, msg.c_str());
-
-    JsonDocument rsp;
-    JsonObject rspObj = rsp.to<JsonObject>();
-    buildError(code, msg, rspObj);
-    sendJson(rsp.as<JsonObjectConst>());
+    buildError(code, rsp);
+    sendResponse(rsp);
   }
-}
 
-namespace {
-  using HandleFn = std::function<void(const JsonObjectConst& req, JsonObject& rsp)>;
-  struct Handler
+  void handleTrigger(const rpcpb_Trigger &req, rpcpb_Rsp &rsp)
   {
-    std::string Kind;
-    HandleFn Fn;
-  };
+    if (req.port == 0) {
+      LOG_WRN("unexpected port: must be >0");
+      buildError(rpcpb_ErrCode_ErrCodeInvalidReq, rsp);
+      return;
+    }
 
-  void handle(const char* reqBuf)
+    uint32_t port = req.port - 1;
+    H4X::Trigger::ErrorCode err = H4X::Trigger::Trigger(
+      port,
+      req.duration_ms,
+      req.delay_ms
+    );
+    switch (err) {
+    case H4X::Trigger::ErrorCode::None:
+      LOG_INF("port %zu triggered: delay_ms=%zu duration_ms=%zu", port, req.duration_ms, req.delay_ms);
+      break;
+    case H4X::Trigger::ErrorCode::PortInvalid:
+      buildError(rpcpb_ErrCode_ErrCodePortInvalid,  rsp);
+      break;
+    case H4X::Trigger::ErrorCode::PortBusy:
+      buildError(rpcpb_ErrCode_ErrCodePortBusy,  rsp);
+      break;
+    default:
+      buildError(rpcpb_ErrCode_ErrCodeInternal,  rsp);
+      break;
+    }
+  }
+
+  void handle(const std::vector<uint8_t> &reqPayload)
   {
-    static JsonDocument req{};
-    static JsonDocument rsp{};
-    static const std::vector<Handler> handlers = {
-      {
-        .Kind = "trg",
-        .Fn = [](const JsonObjectConst& req, JsonObject& rsp) -> void
-        {
-          size_t port = req["port"].as<size_t>();
-          if (!port) {
-            buildError(kErrCodeInvalidReq, "unexpected port: must be >0", rsp);
-            return;
-          }
+    rpcpb_Req req = rpcpb_Req_init_zero;
+    rpcpb_Rsp rsp = rpcpb_Rsp_init_zero;
 
-          --port;
-          H4X::Trigger::ErrorCode err = H4X::Trigger::Trigger(
-            port,
-            req["duration"].as<size_t>(),
-            req["delay"].as<size_t>()
-          );
-          switch (err) {
-          case H4X::Trigger::ErrorCode::None:
-            break;
-          case H4X::Trigger::ErrorCode::PortInvalid:
-            buildError(kErrCodePortInvalid, "requested invalid port", rsp);
-            break;
-          case H4X::Trigger::ErrorCode::PortBusy:
-            buildError(kErrCodePortBusy, "port busy", rsp);
-            break;
-          default:
-            buildError(kErrCodeInternal, "ship happens", rsp);
-            break;
-          }
-        },
-      },
-    };
-
-    req.clear();
-    DeserializationError jsonErr = deserializeJson(req, reqBuf);
-    if (jsonErr) {
-      if (jsonErr != DeserializationError::Code::EmptyInput) {
-        sendError(kErrCodeInvalidReq, jsonErr.c_str());
-      }
+    pb_istream_t stream = pb_istream_from_buffer(reqPayload.data(), reqPayload.size());
+    if (!pb_decode(&stream, rpcpb_Req_fields, &req)) {
+      LOG_WRN("Unable to decode request payload");
+      sendError(rpcpb_ErrCode_ErrCodeInvalidReq, rsp);
       return;
     }
 
-    std::string_view kind = req["kind"].as<std::string_view>();
-    if (kind.empty()) {
-      sendError(kErrCodeInvalidReq, "invalid kind: required");
-      return;
+    switch (req.which_payload) {
+    case rpcpb_Req_trigger_tag:
+      handleTrigger(req.payload.trigger, rsp);
+      break;
+
+    default:
+      buildError(rpcpb_ErrCode_ErrCodeInvalidCommand, rsp);
+      break;
     }
 
-    for (const auto& handler : handlers) {
-      if (handler.Kind != kind) {
-        continue;
-      }
-
-      rsp.clear();
-      JsonObject rspObj = rsp.to<JsonObject>();
-      handler.Fn(req["body"].as<JsonObjectConst>(), rspObj);
-
-      if (rspObj.size() == 0) {
-        rspObj["kind"] = "ack";
-      }
-
-      sendJson(rsp.as<JsonObjectConst>());
-      return;
+    switch (rsp.which_payload) {
+    case 0:
+      rsp.which_payload = rpcpb_Rsp_ack_tag;
+      break;
+    case rpcpb_Rsp_err_tag:
+      LOG_WRN("unable to process request: %zu", req.id);
+      break;
     }
 
-    sendError(kErrCodeInvalidReq, "command not found");
+    rsp.id = req.id;
+    sendResponse(rsp);
   }
 }
 
@@ -156,9 +126,9 @@ int main(void)
 {
   LOG_INF("starting, v%s", APP_VERSION_STRING);
 
-  int err = uarti_init();
+  int err = H4X::HID::Init();
   if (err) {
-    LOG_ERR("unable to initialize uarti: %d", err);
+    LOG_ERR("unable to HID: %d", err);
     return 1;
   }
 
@@ -174,16 +144,16 @@ int main(void)
     return 1;
   }
 
-  char reqBuf[CONFIG_UARTI_RX_BUFFER_SIZE*2] __aligned(4) = {};
+  std::vector<uint8_t> req = {};
   while (1) {
-    err = uarti_pop(&reqBuf, K_FOREVER);
+    err = H4X::HID::Recv(req, K_FOREVER);
     if (err) {
-      LOG_ERR("unable to pop message from uarti: %d", err);
+      LOG_ERR("unable to receive message from HID: %d", err);
       k_sleep(K_MSEC(1));
       continue;
     }
 
-    handle(reqBuf);
+    handle(req);
   }
 
   return 0;

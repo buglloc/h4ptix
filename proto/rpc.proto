@@ -1,0 +1,47 @@
+//go:generate protoc --go_out=. --go_opt=paths=source_relative --proto_path=../../../proto rpc.proto
+
+syntax = "proto3";
+package rpcpb;
+
+option go_package = "github.com/buglloc/h4ptix/software/h4ptix/rpcpb";
+
+enum ErrCode {
+     ErrCodeNone           = 0;
+     ErrCodeInvalidCommand = 1;
+     ErrCodeNotSupported   = 2;
+     ErrCodeInternal       = 3;
+     ErrCodeInvalidReq     = 4;
+     ErrCodePortInvalid    = 5;
+     ErrCodePortBusy       = 6;
+
+     ErrCodeNoDev   = 1337;
+     ErrCodeDevBusy = 1338;
+}
+
+message Trigger {
+  uint32 port = 1;
+  uint32 delay_ms = 2;
+  uint32 duration_ms = 3;
+}
+
+message Ack {
+}
+
+message Err {
+  ErrCode code = 1;
+}
+
+message Req {
+  uint32 id = 1;
+  oneof payload {
+    Trigger trigger = 10;
+  };
+}
+
+message Rsp {
+  uint32 id = 1;
+  oneof payload {
+    Ack ack = 10;
+    Err err = 11;
+  }
+}

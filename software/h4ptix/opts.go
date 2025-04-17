@@ -6,22 +6,22 @@ type Option interface {
 
 type optDevice struct {
 	Option
-	dev Device
+	dev *Device
 }
 
-func WithDevice(dev Device) Option {
+func WithDevice(dev *Device) Option {
 	return optDevice{
 		dev: dev,
 	}
 }
 
-type optDevicePath struct {
+type optDeviceSerial struct {
 	Option
-	path string
+	serial string
 }
 
-func WithDevicePath(path string) Option {
-	return optDevicePath{
-		path: path,
+func WithDeviceSerial(serial string) Option {
+	return optDeviceSerial{
+		serial: serial,
 	}
 }

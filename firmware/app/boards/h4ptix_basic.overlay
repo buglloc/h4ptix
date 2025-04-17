@@ -6,6 +6,12 @@
   chosen {
     zephyr,console = &uart0;
     zephyr,shell-uart = &uart0;
-    utbdk,uarti-dev = &cdc_acm_uart0;
+  };
+
+  hid_dev_0: hid_dev_0 {
+    compatible = "zephyr,hid-device";
+    interface-name = "HID0";
+    in-report-size = <64>;
+    in-polling-period-us = <1000>;
   };
 };

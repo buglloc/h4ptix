@@ -61,6 +61,14 @@ func (h *H4ptix) Open() error {
 	return h.dev.Open()
 }
 
+func (h *H4ptix) Close() error {
+	return h.dev.Close()
+}
+
+func (h *H4ptix) Location() string {
+	return h.dev.Location()
+}
+
 func (h *H4ptix) Trigger(req TriggerReq) error {
 	var rsp rpcpb.Rsp
 	return h.roundTrip(
@@ -115,8 +123,4 @@ func (h *H4ptix) roundTrip(req *rpcpb.Req, rsp *rpcpb.Rsp) error {
 	}
 
 	return nil
-}
-
-func (h *H4ptix) Close() error {
-	return h.dev.Close()
 }

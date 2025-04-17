@@ -3,10 +3,13 @@
 
 manifest:
   #version: 0.1
-  
+
   remotes:
     - name: zephyr
       url-base: https://github.com/zephyrproject-rtos
+
+  group-filter:
+    - +optional
 
   projects:
     - name: zephyr
@@ -18,3 +21,4 @@ manifest:
         name-allowlist:
           - cmsis
           - hal_rpi_pico
+          - nanopb

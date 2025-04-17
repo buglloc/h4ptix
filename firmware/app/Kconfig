@@ -16,3 +16,4 @@ source "subsys/logging/Kconfig.template.log_config"
 
 rsource "Kconfig.trigger"
 rsource "Kconfig.ui"
+rsource "Kconfig.hid"

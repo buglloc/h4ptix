@@ -1,6 +1,7 @@
 [manifest]
 path = firmware
 file = west.yml
+project-filter = +nanopb
 
 [zephyr]
 base = zephyr

@@ -20,4 +20,4 @@ config APP_TRIGGER_TASK_PRIORITY
   int "Trigger work task priority"
   default 5
 
-endif # UI
+endif # APP_TRIGGER

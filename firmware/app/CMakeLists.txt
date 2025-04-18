@@ -8,7 +8,7 @@ project(app LANGUAGES CXX)
 target_sources(app
 PRIVATE
   src/main.cxx
-  src/hid.cxx
+  src/rpc.cxx
   src/trigger.cxx
   src/ui.cxx
   src/ui/led.cxx

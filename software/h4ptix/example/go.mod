@@ -8,7 +8,7 @@ require (
 )
 
 require (
-	github.com/buglloc/usbhid v0.9.2 // indirect
+	github.com/buglloc/usbhid v0.9.3-0.20250417180038-dc8b595c57d1 // indirect
 	github.com/ebitengine/purego v0.8.2 // indirect
 	github.com/inconshreveable/mousetrap v1.1.0 // indirect
 	github.com/spf13/pflag v1.0.6 // indirect

@@ -1,14 +1,19 @@
-#include "hid.h"
+#include "rpc.h"
 
-#include <cerrno>
-#include <cstddef>
 #include <cstdint>
+
 #include <zephyr/device.h>
 #include <zephyr/kernel.h>
 #include <zephyr/logging/log.h>
+#include <zephyr/sys/ring_buffer.h>
 
 #include <zephyr/usb/class/usbd_hid.h>
 #include <zephyr/usb/usbd.h>
+
+#include <pb_encode.h>
+#include <pb_decode.h>
+#include "rpc.pb.h"
+
 
 LOG_MODULE_DECLARE(app, CONFIG_APP_LOG_LEVEL);
 
@@ -52,8 +57,7 @@ namespace {
 
 /* process staff*/
 namespace {
-  HID::MsgRingBuffer<CONFIG_APP_HID_MAX_MSG_SIZE, CONFIG_APP_HID_QUEUE_SIZE> rxBuf_;
-  K_SEM_DEFINE(rxSem_, 0, CONFIG_APP_HID_QUEUE_SIZE);
+  K_MSGQ_DEFINE(rxMsgQ_, CONFIG_APP_HID_MAX_MSG_SIZE, CONFIG_APP_HID_QUEUE_SIZE, 4);
 
   void hidIfaceReadyCb(const struct device *dev, const bool ready)
   {
@@ -79,13 +83,18 @@ namespace {
       return -ENOTSUP;
     }
 
-    int err = rxBuf_.Put(buf, len);
-    if (err) {
-      LOG_WRN("Unable to put data info buf: %d", err);
-      return -EIO;
+
+    rpcpb_Req req = rpcpb_Req_init_zero;
+    pb_istream_t stream = pb_istream_from_buffer(buf, len);
+    if (!pb_decode(&stream, rpcpb_Req_fields, &req)) {
+      LOG_WRN("Unable to decode request payload");
+      return -EINVAL;
     }
 
-    k_sem_give(&rxSem_);
+    if (k_msgq_put(&rxMsgQ_, &req, K_NO_WAIT) != 0) {
+      LOG_WRN("RX queue is full");
+      return -ENOMEM;
+    }
     return 0;
   }
 
@@ -122,7 +131,7 @@ namespace {
   };
 }
 
-int HID::Init()
+int RPC::Init()
 {
   LOG_INF("initialize HID device");
   dev_ = DEVICE_DT_GET_ONE(zephyr_hid_device);
@@ -198,18 +207,25 @@ int HID::Init()
   return 0;
 }
 
-int HID::Recv(std::vector<uint8_t> &out, k_timeout_t timeout)
+int RPC::Accept(rpcpb_Req &out, k_timeout_t timeout)
 {
-  int err = k_sem_take(&rxSem_, timeout);
-  if (err) {
-    LOG_WRN("Failed to take rx semaphore: %d", err);
-    return err;
-  }
-
-  return rxBuf_.Get(out);
+  return k_msgq_get(&rxMsgQ_, &out, timeout);
 }
 
-int HID::Send(const uint8_t *data, size_t len)
+int RPC::Send(const rpcpb_Rsp &rsp)
 {
-  return hid_device_submit_report(dev_, len, data);
+  uint8_t buf[rpcpb_Rsp_size];
+  pb_ostream_t stream = pb_ostream_from_buffer(buf, sizeof(buf));
+  if (!pb_encode(&stream, rpcpb_Rsp_fields, &rsp)) {
+    LOG_WRN("unable to encode response");
+    return -EINVAL;
+  }
+
+  return hid_device_submit_report(dev_, stream.bytes_written, buf);
+}
+
+void RPC::PutError(rpcpb_Rsp &rsp, rpcpb_ErrCode code)
+{
+  rsp.which_payload = rpcpb_Rsp_err_tag;
+  rsp.payload.err.code = code;
 }

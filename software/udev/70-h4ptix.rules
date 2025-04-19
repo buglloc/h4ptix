@@ -1,7 +1,7 @@
 # this udev file should be used with udev 188 and newer
 ACTION!="add|change", GOTO="h4ptix_end"
 
-# Yubico YubiKey
+# H4ptiX
 KERNEL=="hidraw*", SUBSYSTEM=="hidraw", ATTRS{idVendor}=="1209", ATTRS{idProduct}=="f601", MODE="0660", TAG+="uaccess"
 
 LABEL="h4ptix_end"

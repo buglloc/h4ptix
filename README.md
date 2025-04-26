@@ -2,7 +2,9 @@
 
 The **H4ptiX** is a hardware/software solution designed to simulate physical interactions with **YubiKey** during automated testing. This device allows test frameworks to programmatically "touch" the YubiKey, enabling end-to-end (E2E) testing of multi-factor authentication (MFA) flows without manual intervention.
 
-![](docs/irl.jpg)
+![](docs/cover.jpg)
+
+Port about (in Russian): https://ut.buglloc.com/2025/04/h4ptix/
 
 #### Key Features
 - **Physical YubiKey Interaction**: A capacitive touch mechanism triggers the YubiKey sensor as if pressed by a user.

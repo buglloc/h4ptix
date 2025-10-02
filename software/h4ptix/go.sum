@@ -1,7 +1,7 @@
-github.com/buglloc/usbhid v0.9.3-0.20250417180038-dc8b595c57d1 h1:gb47E68XEP5eAjJWlZkBGU9BbNXwXFQ2V1IkPGOp+R8=
-github.com/buglloc/usbhid v0.9.3-0.20250417180038-dc8b595c57d1/go.mod h1:OQPhQ1UikV9Wf17mJHw5diyGcuaUIXzobyKXVImkyDE=
-github.com/ebitengine/purego v0.8.2 h1:jPPGWs2sZ1UgOSgD2bClL0MJIqu58nOmIcBuXr62z1I=
-github.com/ebitengine/purego v0.8.2/go.mod h1:iIjxzd6CiRiOG0UyXP+V1+jWqUXVjPKLAI0mRfJZTmQ=
+github.com/buglloc/usbhid v0.9.3 h1:pnRf4N0lzZrp3+qZjRK2Wy/VTljaaLf8Ok21EVnegYU=
+github.com/buglloc/usbhid v0.9.3/go.mod h1:WeH4PNKP3MH2Kni4arN0VuWfcIgLMnCgQz/7y/4NRmE=
+github.com/ebitengine/purego v0.9.0 h1:mh0zpKBIXDceC63hpvPuGLiJ8ZAa3DfrFTudmfi8A4k=
+github.com/ebitengine/purego v0.9.0/go.mod h1:iIjxzd6CiRiOG0UyXP+V1+jWqUXVjPKLAI0mRfJZTmQ=
 github.com/google/go-cmp v0.5.5 h1:Khx7svrCpmxxtHBq5j2mp/xVjsi8hQMfNLvJFAlrGgU=
 github.com/google/go-cmp v0.5.5/go.mod h1:v8dTdLbMG2kIc/vJvl+f65V22dbkXbowE6jgT/gNBxE=
 golang.org/x/xerrors v0.0.0-20191204190536-9bdfabe68543 h1:E7g+9GITq07hpfrRu66IVDexMakfv52eLZ2CXBWiKr4=
